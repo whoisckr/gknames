@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sorted Table</title>
+    <link rel="icon" type="image/x-icon" href="./gklogo.png?">
+    <title>Sorted Map</title>
     <style>
         table {
             width: 100%;
@@ -33,8 +34,11 @@
 <script>
     (async function () {
         try {
-            const response = await fetch('map.json');
+            const timestamp = new Date().getTime();
+            const response = await fetch(`map.json?${timestamp}`);
             const jsonData = await response.json();
+            // alphabetize based on rom
+            // here, han is the key & rom is the value
             const dataArray = Object.entries(jsonData).map(([key, value]) => ({ key, value }));
             dataArray.sort((a, b) => a.value.localeCompare(b.value));
             const fragment = document.createDocumentFragment();
@@ -52,8 +56,10 @@
             headerCell2.style.backgroundColor = '#FFFF64';
             const romanizationMap = new Map();
             dataArray.forEach(({ key, value }) => {
+                // checks if entries have matching rom
                 const romanization = value;
                 if (romanizationMap.has(romanization)) {
+                    // groups the han together
                     const existingCell = romanizationMap.get(romanization);
                     existingCell.textContent += `, ${key}`;
                 } else {
