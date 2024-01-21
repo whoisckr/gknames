@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GK Names</title>
+    <link rel="icon" type="image/x-icon" href="gklogo.png">
+    <link rel="stylesheet" href="gknames.css">
+</head>
+<body>
+    <h1>GK Names</h1>
+    <p>This tool is intended to romanize Hangul artist names for Genius Korea when there is no official/preferred romanization from the artist/agency.</p>
+    <label for="koreanName"><b>Hangul:</b></label>
+    <input type="text" id="koreanName" placeholder="e.g. 김태형">
+    <p>⬇️ Copy to clipboard.</p>
+    <button id="romAndHanBtn">ROM + HAN (Performer)</button>
+    <button id="hanAndRomBtn">HAN + ROM (Non-Performer)</button>
+    <button id="onlyRomBtn">ROM Only</button>
+    <p><b>Need help?</b> <a href="https://genius.com/messages/new?recipient=ckr">Contact ckr.</a></p>
+    <p><b>Character missing?</b> This tool is not yet exhaustive. Follow Revised Romanization instead for the missing character(s).</p>
+    <p id="result"></p>
+    <script>
+        var timestamp = new Date().getTime();
+        document.write('<script src="gknames.js?' + timestamp + '"><\/script>');
+    </script>
+</body>
+</html>
