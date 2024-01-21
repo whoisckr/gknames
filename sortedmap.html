@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorted Table</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #FFFF64;
+            font-weight: bold;
+        }
+
+        .rowCount {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<script>
+    (async function () {
+        try {
+            const response = await fetch('map.json');
+            const jsonData = await response.json();
+            const dataArray = Object.entries(jsonData).map(([key, value]) => ({ key, value }));
+            dataArray.sort((a, b) => a.value.localeCompare(b.value));
+            const fragment = document.createDocumentFragment();
+            const table = document.createElement('table');
+            const thead = table.createTHead();
+            const tbody = table.createTBody();
+            const headerRow = thead.insertRow();
+            const headerCell1 = headerRow.insertCell(0);
+            const headerCell2 = headerRow.insertCell(1);
+            headerCell1.textContent = 'HAN';
+            headerCell2.textContent = 'ROM';
+            headerCell1.style.fontWeight = 'bold';
+            headerCell1.style.backgroundColor = '#FFFF64';
+            headerCell2.style.fontWeight = 'bold';
+            headerCell2.style.backgroundColor = '#FFFF64';
+            const romanizationMap = new Map();
+            dataArray.forEach(({ key, value }) => {
+                const romanization = value;
+                if (romanizationMap.has(romanization)) {
+                    const existingCell = romanizationMap.get(romanization);
+                    existingCell.textContent += `, ${key}`;
+                } else {
+                    const row = tbody.insertRow();
+                    const cell1 = row.insertCell(0);
+                    const cell2 = row.insertCell(1);
+                    cell1.textContent = key;
+                    cell2.textContent = romanization;
+                    romanizationMap.set(romanization, cell1);
+                }
+            });
+            fragment.appendChild(table);
+            document.body.appendChild(fragment);
+            const rowCountDiv = document.createElement('div');
+            rowCountDiv.className = 'rowCount';
+            rowCountDiv.textContent = `ROM #: ${dataArray.length}`;
+            document.body.insertBefore(rowCountDiv, table);
+        } catch (error) {
+            console.error('Error fetching or processing map.json:', error);
+        }
+    })();
+</script>
+</body>
+</html>
