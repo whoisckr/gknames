@@ -1,44 +1,42 @@
 (function () {
     async function loadConversionMap() {
         try {
-            const cacheBuster = Date.now();
-            const response = await fetch(`map.json?${cacheBuster}`);
-            const jsonData = await response.json();
-            return jsonData;
+            const timestamp = Date.now();
+            const response = await fetch(`map.json?${timestamp}`);
+            const conversionMap = await response.json();
+            return conversionMap;
         } catch (error) {
             console.error('Error loading conversion map:', error);
-            console.log('Raw JSON response:', await response.text());
             return null;
         }
     }
 
-    async function convertName(koreanName, conversionMap) {
+    function convertName(koreanName, conversionMap) { // just outputs rom, see copyConvert for formats
         if (!conversionMap) {
             console.error('Conversion map not loaded.');
             return null;
         }
 
-        let convertedName = '';
-        let isFirstConversion = true;
+        let romanizedName = '';
+        let isFirstChar = true; // prevents extra space before first char
 
         for (const char of koreanName) {
             if (conversionMap[char]) {
-                if (!isFirstConversion) {
-                    convertedName += ' ';
+                if (!isFirstChar) { 
+                    romanizedName += ' ';
                 }
-                convertedName += conversionMap[char];
-                isFirstConversion = false;
+                romanizedName += conversionMap[char];
+                isFirstChar = false;
             } else {
                 //console.log(`Character not found in conversion map: ${char}`);
-                convertedName += char;
+                romanizedName += char;
             }
         }
 
-        return convertedName;
+        return romanizedName;
     }
 
-    async function copyOrConvert(format) {
-        const resultParagraph = document.getElementById('result');
+    async function copyConvert(format) { // formats rom name + copies to clipboard
         const koreanNameInput = document.getElementById('koreanName');
         const koreanName = koreanNameInput.value.trim();
 
@@ -60,13 +58,12 @@
 
         try {
             await navigator.clipboard.writeText(resultText);
-        } catch (err) {
-            console.error('Unable to copy to clipboard.', err);
+        } catch (error) {
+            console.error('Unable to copy to clipboard.', error);
         }
     }
 
-    // Link event to button
-    document.getElementById('romAndHanBtn').addEventListener('click', () => copyOrConvert('romAndHan'));
-    document.getElementById('hanAndRomBtn').addEventListener('click', () => copyOrConvert('hanAndRom'));
-    document.getElementById('onlyRomBtn').addEventListener('click', () => copyOrConvert('onlyRom'));
+    document.getElementById('romAndHanBtn').addEventListener('click', () => copyConvert('romAndHan'));
+    document.getElementById('hanAndRomBtn').addEventListener('click', () => copyConvert('hanAndRom'));
+    document.getElementById('onlyRomBtn').addEventListener('click', () => copyConvert('onlyRom'));
 })();
