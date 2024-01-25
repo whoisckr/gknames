@@ -1,4 +1,6 @@
 (function () {
+    const MAX_LOCAL_STORAGE_SIZE = 5 * 1024 * 1024; // 5 MB
+
     async function loadConversionMap() {
         try {
             const timestamp = Date.now();
@@ -22,7 +24,7 @@
 
         for (const char of koreanName) {
             if (conversionMap[char]) {
-                if (!isFirstChar) { 
+                if (!isFirstChar) {
                     romanizedName += ' ';
                 }
                 romanizedName += conversionMap[char];
@@ -57,13 +59,54 @@
         }
 
         try {
+            logToHistory(koreanName, resultText);
             await navigator.clipboard.writeText(resultText);
         } catch (error) {
             console.error('Unable to copy to clipboard.', error);
         }
     }
 
+    function logToHistory(koreanName, resultText) {
+        if (koreanName === undefined || resultText === undefined) {
+            return;
+        }
+
+        const history = JSON.parse(localStorage.getItem('conversionHistory')) || [];
+        const timestamp = Date.now();
+        history.push({ timestamp, resultText, koreanName });
+        localStorage.setItem('conversionHistory', JSON.stringify(history));
+        checkLocalStorageSize();
+    }
+
+
+    function downloadHistory() {
+        const history = JSON.parse(localStorage.getItem('conversionHistory')) || [];
+        const historyText = history.map(entry => `${new Date(entry.timestamp).toLocaleString()}: ${entry.koreanName}, ${entry.resultText}`).join('\n');
+        const blob = new Blob([historyText], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'conversion_history.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    function clearHistory() {
+        localStorage.removeItem('conversionHistory');
+    }
+
+    function checkLocalStorageSize() {
+        if (localStorage && localStorage.length > MAX_LOCAL_STORAGE_SIZE) {
+            localStorage.clear();
+        }
+    }
+
     document.getElementById('romAndHanBtn').addEventListener('click', () => copyConvert('romAndHan'));
     document.getElementById('hanAndRomBtn').addEventListener('click', () => copyConvert('hanAndRom'));
     document.getElementById('onlyRomBtn').addEventListener('click', () => copyConvert('onlyRom'));
+    document.getElementById('downloadHistoryButton').addEventListener('click', downloadHistory);
+    document.getElementById('clearHistoryButton').addEventListener('click', clearHistory);
 })();
