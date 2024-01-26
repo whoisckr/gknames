@@ -72,7 +72,7 @@
         }
 
         const history = JSON.parse(localStorage.getItem('conversionHistory')) || [];
-        const timestamp = Date.now();
+        const timestamp = Date().toISOString();
         history.push({ timestamp, resultText, koreanName });
         localStorage.setItem('conversionHistory', JSON.stringify(history));
         checkLocalStorageSize();
